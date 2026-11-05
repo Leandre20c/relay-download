@@ -1,0 +1,1 @@
+window.RELEASE = { "version": "0.1.0", "windows": { "size": 18831170, "sha256": "055632ac52beb7d257c425b951f8ee13695875c12f1a203d98218e57124dd170" }, "android": { "size": 49452125, "sha256": "fdeedabec32baa9e3b5b19bcf3aadce41dac62af6dff09fec2e41dfccce45e5a" } };

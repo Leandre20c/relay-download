@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Relay</title>
+<meta name="description" content="Envoie tes fichiers entre ton PC et ton téléphone Android, chiffrés de bout en bout et sans compte.">
+<link rel="icon" href="relay-logo.svg" type="image/svg+xml">
+<style>
+  /* Tokens du design system Relay. Police système : aucune requête vers un service tiers. */
+  :root {
+    --surface: #ffffff; --surface-100: #f6f6f7; --surface-200: #ececef; --line: #e2e2e6;
+    --ink: #18181b; --ink-muted: #5f5f68;
+    --accent: #0f7a6b; --accent-ink: #ffffff; --accent-soft: #e3f3f0; --danger: #c2321f;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root {
+    --surface: #121214; --surface-100: #1a1a1d; --surface-200: #26262a; --line: #2f2f34;
+    --ink: #f4f4f5; --ink-muted: #a3a3ad;
+    --accent: #3cc3ab; --accent-ink: #0a2b26; --accent-soft: #173431; --danger: #ff7b68;
+    color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface); color: var(--ink); font: 400 16px/1.55 var(--sans);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  main { max-width: 760px; margin: 0 auto; padding-block: 64px 48px; display: flex; flex-direction: column; gap: 48px; }
+  h1 { margin: 0; font-size: clamp(32px, 7vw, 46px); line-height: 1.1; font-weight: 650; letter-spacing: -.025em; text-wrap: balance; }
+  h2 { margin: 0 0 16px; font-size: 20px; line-height: 28px; font-weight: 600; }
+  p { margin: 0; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hero { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; }
+  .brand { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 650; letter-spacing: -.02em; }
+  .brand img { width: 44px; height: 44px; display: block; }
+  .lead { color: var(--ink-muted); font-size: 18px; max-width: 58ch; }
+  .downloads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; margin-top: 8px; }
+  .dl { display: flex; flex-direction: column; gap: 2px; padding: 16px 20px; border: 1px solid var(--line); border-radius: 16px;
+    background: var(--surface-100); color: var(--ink); text-decoration: none; transition: border-color .15s, background .15s; }
+  .dl:hover { border-color: var(--accent); }
+  .dl strong { font-size: 17px; font-weight: 600; }
+  .dl span { color: var(--ink-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .dl.primary { order: -1; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .dl.primary span { color: var(--accent-ink); }
+  .dl.primary:hover { filter: brightness(1.06); }
+  .note { color: var(--ink-muted); font-size: 14px; }
+  .steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+  .steps h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+  ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+  .state { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+  .state ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+  .state h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+  .warning { border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; background: var(--surface-100); font-size: 15px; }
+  .warning strong { font-weight: 600; }
+  .hashes { display: flex; flex-direction: column; gap: 12px; }
+  .hash { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 13px; }
+  .hash code { font: 400 13px/20px var(--mono); overflow-wrap: anywhere; color: var(--ink-muted); }
+  footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--ink-muted); font-size: 13px; }
+  @media (max-width: 600px) {
+    main { padding-block: 40px 32px; gap: 40px; }
+    .downloads, .steps, .state { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="brand"><img src="relay-logo.svg" alt="" width="44" height="44">Relay</div>
+    <h1>Tes fichiers, de ton PC à ton téléphone. Sans passer par Discord.</h1>
+    <p class="lead">Relay envoie directement tes fichiers entre tes appareils, chiffrés de bout en bout. Pas de compte, pas de limite de taille imposée par l'app.</p>
+    <div class="downloads">
+      <a class="dl" id="dl-windows" href="https://github.com/Leandre20c/relay-download/releases/latest/download/Relay-Windows.zip">
+        <strong>Télécharger pour Windows</strong><span id="meta-windows">Windows 10 ou plus récent, 64 bits</span>
+      </a>
+      <a class="dl" id="dl-android" href="https://github.com/Leandre20c/relay-download/releases/latest/download/Relay-Android.apk">
+        <strong>Télécharger pour Android</strong><span id="meta-android">Android 7 ou plus récent, 64 bits</span>
+      </a>
+    </div>
+    <p class="note" id="platform-note">Version de test. Non disponible pour iPhone, Mac et Linux.</p>
+  </section>
+
+  <section>
+    <h2>Installer</h2>
+    <div class="steps">
+      <div>
+        <h3>Windows</h3>
+        <ol>
+          <li>Décompresse le zip et garde tout le dossier ensemble.</li>
+          <li>Lance <code>relay.exe</code>.</li>
+          <li>Si Windows affiche un avertissement, choisis « Informations complémentaires », puis « Exécuter quand même ». L'app n'est pas signée.</li>
+          <li>Autorise Relay dans le pare-feu si Windows le demande.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Android</h3>
+        <ol>
+          <li>Ouvre le fichier téléchargé.</li>
+          <li>Autorise l'installation depuis ton navigateur si Android le demande.</li>
+          <li>Installe l'app. Play Protect peut afficher un avertissement, car elle ne vient pas du Play Store.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Relier tes appareils</h2>
+    <p>Dans Relay, choisis « Ajouter un appareil » sur le premier, puis scanne le QR code avec le second. Tu peux ensuite glisser un fichier sur la fenêtre du PC, ou utiliser le menu de partage d'Android.</p>
+  </section>
+
+  <section>
+    <h2>Où en est l'app</h2>
+    <div class="state">
+      <div>
+        <h3>Déjà là</h3>
+        <ul>
+          <li>Appairage par QR code, ou par code court en réseau local</li>
+          <li>Envoi de fichiers, d'images, de texte et de liens</li>
+          <li>Glisser-déposer sur PC, menu de partage sur Android</li>
+          <li>Historique consultable hors ligne</li>
+          <li>Connexion directe si possible, sinon relais chiffré</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Pas encore</h3>
+        <ul>
+          <li>Réception sur Android quand l'app est fermée</li>
+          <li>Reprise automatique après une coupure</li>
+          <li>Envoi de dossiers</li>
+          <li>Progression et vitesse pendant l'envoi</li>
+          <li>Notifications et raccourci global</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="warning"><strong>N'appaire que tes propres appareils.</strong> Un appareil appairé peut t'envoyer des fichiers sans te demander ton accord, et ils arrivent directement dans ton dossier de réception.</p>
+
+  <section id="verify" hidden>
+    <h2>Vérifier les téléchargements</h2>
+    <div class="hashes">
+      <div class="hash"><span>Windows, SHA-256</span><code id="sha-windows"></code></div>
+      <div class="hash"><span>Android, SHA-256</span><code id="sha-android"></code></div>
+    </div>
+  </section>
+
+  <footer id="foot">Relay. Aucune télémétrie.</footer>
+</main>
+<script src="release.js"></script>
+<script>
+  (function () {
+    var ua = navigator.userAgent;
+    var windows = document.getElementById("dl-windows");
+    var android = document.getElementById("dl-android");
+    var note = document.getElementById("platform-note");
+    if (/Android/i.test(ua)) android.classList.add("primary");
+    else if (/Windows/i.test(ua)) windows.classList.add("primary");
+    else if (/iPhone|iPad|Macintosh|Linux/i.test(ua)) note.textContent = "Relay n'existe pas encore pour cet appareil. Version de test pour Windows et Android.";
+
+    var r = window.RELEASE;
+    if (!r) return;
+    function mo(bytes) { return Math.round(bytes / 1048576) + " Mo"; }
+    document.getElementById("meta-windows").textContent = "Windows 10 ou plus récent, 64 bits · " + mo(r.windows.size);
+    document.getElementById("meta-android").textContent = "Android 7 ou plus récent, 64 bits · " + mo(r.android.size);
+    document.getElementById("sha-windows").textContent = r.windows.sha256;
+    document.getElementById("sha-android").textContent = r.android.sha256;
+    document.getElementById("verify").hidden = false;
+    document.getElementById("foot").textContent = "Relay " + r.version + ". Aucune télémétrie.";
+  })();
+</script>
+</body>
+</html>
